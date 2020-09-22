@@ -176,7 +176,7 @@ async function main() {
             const user = msg.mentions.users.first()
 
             if (user) { // OTHER USER
-                selectedProfile = getProfile(user.id);
+                selectedProfile = await getProfile(user.id);
             }
 
             const name = user ? user.username : msg.author.username;
@@ -208,8 +208,5 @@ async function main() {
     perodicChecks(1000 * 60 * 5);
     bot.login(token); //bot starts
 }
-
-
-
 
 main();
