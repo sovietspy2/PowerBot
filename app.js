@@ -2,7 +2,6 @@ require('dotenv').config()
 const level = require('level')
 const Discord = require("discord.js");
 const logger = require("./logger");
-const { profile } = require('winston');
 
 const token = process.env.TOKEN
 const bot = new Discord.Client()
