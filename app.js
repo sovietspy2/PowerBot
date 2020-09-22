@@ -8,7 +8,7 @@ const bot = new Discord.Client()
 
 const prefix = '!'
 // create or open database
-const db = level('/data/power');
+const db = level(process.env.DB);
 
 logger.info("LOGGER INFO");
 logger.debug("LOGGER DEBUG");
