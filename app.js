@@ -121,11 +121,14 @@ async function main() {
 
 
         if (command === 'complete') {
-            const user = msg.author.id
-            console.log(msg);
+            args.forEach(task => {
+                if (task.includes(process.env.COMPLETE_TEMPLATE)) {
+                    bot.channels.cache.get(activeChannel).send(`<@${profile.id}> just completed :white_check_mark:${task} and recieved 30XP `);
+                    profile.xp += 30;
+                    profile.credits += 10;
 
-            let embed = await statEmbed(user.username, 'tessst')
-            msg.channel.send(embed)
+                }
+            });
         }
 
         if (command === 'slap') {
@@ -188,14 +191,9 @@ async function main() {
             let embed = new Discord.MessageEmbed()
             embed.setTitle('Avaiable commands:')
             embed.setDescription(`usage: !commandName`)
-
-
             embed.addField("See a user's status", "`!stats @user`", true)
-
             embed.addField("Slap someone", "`!slap @user`", true)
-
             embed.addField("Complete a task", '`!complete HBP3-1234`')
-
             //embed.setFooter(`this embed made by ${msg.author.username}`)
             msg.channel.send(embed)
 
