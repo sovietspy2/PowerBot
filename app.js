@@ -112,6 +112,27 @@ async function main() {
             msg.channel.send("TEST")
         }
 
+        if (command === 'color') {
+
+            if (!args.length) {
+                return msg.channel.send(`You didn't provide any arguments, ${msg.author}!`);
+            }
+
+            var role = msg.member.roles.cache.find(role => role.id === '758090774255763496');  // my special role id
+
+            if (role) {
+                const color = args.shift();
+                switch (color) {
+                    case "random":
+                        return role.setColor("RANDOM").catch(console.error);
+                    default:
+                        return msg.channel.send(`${color} is not implemented yet!`);
+                }
+            } else {
+                return msg.channel.send(`No permission. LOL`);
+            }
+        }
+
 
         if (command === 'complete') {
             args.forEach(task => {
@@ -204,6 +225,7 @@ async function main() {
             embed.addField("Complete a task", '`!complete HBP3-1234`');
             embed.addField("Steal credits", '`!steal @user`');
             embed.addField("Announce something important", '`!announce <text>`')
+            embed.addField("Change color", '`!color random`')
             //embed.setFooter(`this embed made by ${msg.author.username}`)
             msg.channel.send(embed)
 
