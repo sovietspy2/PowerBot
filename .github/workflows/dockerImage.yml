@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-18.04    
     env:      
       DOCKER_REGISTRY: registry.hub.docker.com     
-      DOCKER_IMAGE: sovietspy2/PowerBot      
+      DOCKER_IMAGE: sovietspy2/power-bot     
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
       DOCKER_TARGET_PLATFORM: linux/arm/v7                 
@@ -32,4 +32,5 @@ jobs:
     - name: Run Buildx (push image)      
       if: success()      
       run: |        
-        docker buildx build \        --platform ${{ steps.prepare.outputs.docker_platform }} \        --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \        --file ./Dockerfile \        --output type=image,push=true .
+        docker buildx build  --platform ${{ steps.prepare.outputs.docker_platform }}  --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}  --file ./Dockerfile  --output type=image,push=true .
+        
