@@ -9,7 +9,7 @@ DB=/data/power
 ```
 
 
-###docker-compose.yml:
+### docker-compose.yml:
 ```
 version: "3"
 
