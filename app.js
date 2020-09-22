@@ -43,7 +43,7 @@ async function saveProfile(id, profile) {
 }
 
 async function handleFirstLoginOfTheDay(msg) {
-    if (!firstLoginWinner && new Date().getHours() >= 20 && new Date().getHours() <= 21) {
+    if (!firstLoginWinner && new Date().getHours() >= 7 && new Date().getHours() <= 9) {
         if (activeChannel) {
 
             const profile = await getProfile(msg.author.id);
