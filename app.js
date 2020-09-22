@@ -91,13 +91,6 @@ async function main() {
     }
 
 
-    const statEmbed = async (username, rank) => {
-        let embed = new Discord.MessageEmbed()
-        embed.setTitle(`Ranking for ${username}`)
-        embed.setDescription(`Score is ${rank}`)
-        return embed
-    }
-
 
     bot.on('message', async (msg) => {
 
@@ -129,6 +122,21 @@ async function main() {
 
                 }
             });
+        }
+
+        if (command === 'announce') {
+            try {
+                const message = args
+                    .map(item => item.toLocaleLowerCase())
+                    .join(" ")
+                    .split("")
+                    .map(letter => letter != " " ? `:regional_indicator_${letter}:` : " ")
+                    .join("");
+                bot.channels.cache.get(activeChannel).send(message);
+            } catch (e) {
+                logger.error(e);
+            }
+
         }
 
         if (command === 'slap') {
@@ -190,10 +198,12 @@ async function main() {
         if (command === 'help') {
             let embed = new Discord.MessageEmbed()
             embed.setTitle('Avaiable commands:')
-            embed.setDescription(`usage: !commandName`)
-            embed.addField("See a user's status", "`!stats @user`", true)
-            embed.addField("Slap someone", "`!slap @user`", true)
-            embed.addField("Complete a task", '`!complete HBP3-1234`')
+            embed.setDescription(`usage: !commandName`);
+            embed.addField("See a user's status", "`!stats @user`");
+            embed.addField("Slap someone", "`!slap @user`");
+            embed.addField("Complete a task", '`!complete HBP3-1234`');
+            embed.addField("Steal credits", '`!steal @user`');
+            embed.addField("Announce something important", '`!announce <text>`')
             //embed.setFooter(`this embed made by ${msg.author.username}`)
             msg.channel.send(embed)
 
