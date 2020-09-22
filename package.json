@@ -4,6 +4,7 @@
   "description": "This is a discord bot",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +17,12 @@
   "bugs": {
     "url": "https://github.com/sovietspy2/PowerBot/issues"
   },
-  "homepage": "https://github.com/sovietspy2/PowerBot#readme"
+  "homepage": "https://github.com/sovietspy2/PowerBot#readme",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "level": "^6.0.1",
+    "nodemon": "^2.0.4",
+    "winston": "^3.3.3"
+  }
 }
