@@ -1,10 +1,19 @@
 require('dotenv').config()
 const level = require('level')
+const fs = require('fs');
 const Discord = require("discord.js");
 const logger = require("./logger");
 
 const token = process.env.TOKEN
 const bot = new Discord.Client()
+bot.commands = new Discord.Collection()
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+
+    bot.commands.set(command.name, command);
+}
 
 const prefix = '!'
 // create or open database
@@ -54,30 +63,10 @@ async function handleFirstLoginOfTheDay(msg) {
 
             firstLoginWinner = msg.author.id;
             console.log("first winner announced");
-            //bot.channels.cache.get(activeChannel).send(`<@${msg.author.id}> is the first today and recieved 25 XP and 10 credits! :yawning_face: `);
+            bot.channels.cache.get(activeChannel).send(`<@${msg.author.id}> is the first today and recieved 25 XP and 10 credits! :yawning_face: `);
         }
     }
 }
-
-async function validateTask(task, userId) {
-    // tobbszor ne lehessen completolni 
-    // key TASKID value USERNAME 
-    // tehat ugyan az a user csak 1 szer clamielheti egyszerre, de ha kesobb visszakapja akkor mjd urja
-    let valid = true;
-    let existingUser
-    try {
-        existingUser = await db.get(task);
-        valid = existingUser !== userId;
-
-        if (valid) {
-            await db.put(task, userId);
-        }
-    } catch (e) {
-        await db.put(task, userId);
-    }
-    return valid;
-}
-
 
 async function main() {
 
@@ -124,139 +113,24 @@ async function main() {
         }
 
         const profile = await getProfile(msg.author.id);
+
         const args = msg.content.slice(prefix.length).trim().split(' ')
-        const command = args.shift().toLowerCase()
 
+        const commandName = args.shift().toLowerCase();
 
-        if (command === 'test') {
-            msg.channel.send("TEST")
-        }
+        if (!bot.commands.has(commandName)) return;
 
-        if (command === 'color') {
+        const command = bot.commands.get(commandName);
 
-            if (!args.length) {
-                return msg.channel.send(`You didn't provide any arguments, ${msg.author}!`);
+        try {
+            await command.execute(msg, args, profile, db);
+
+            if (command.guildOnly && msg.channel.type === 'dm') {
+                return message.reply('I can\'t execute that command inside DMs!');
             }
-
-            var role = msg.member.roles.cache.find(role => role.id === '758090774255763496');  // my special role id
-
-            if (role) {
-                const color = args.shift();
-                switch (color) {
-                    case "random":
-                        return role.setColor("RANDOM").catch(console.error);
-                    default:
-                        return msg.channel.send(`${color} is not implemented yet!`);
-                }
-            } else {
-                return msg.channel.send(`No permission. LOL`);
-            }
-        }
-
-
-        if (command === 'complete') {
-            for (task of args) {
-
-                if (task.includes(process.env.COMPLETE_TEMPLATE) && await validateTask(task, profile.id)) {
-                    bot.channels.cache.get(activeChannel).send(`<@${profile.id}> just completed :white_check_mark:${task} and recieved 30XP `);
-                    profile.xp += 30;
-                    profile.credits += 10;
-                } else {
-                    msg.reply('Nah not happening! This seems fishy!');
-                }
-            }
-        }
-
-        if (command === 'announce') {
-
-            const pattern = new RegExp('[a-z ]', 'g');
-
-            try {
-                const message = args
-                    .map(item => item.toLocaleLowerCase())
-                    .join(" ")
-                    .split("")
-                    .filter(letter => letter.match(pattern))
-                    .map(letter => letter != " " ? `:regional_indicator_${letter}:` : " ")
-                    .join("");
-                if (message) {
-                    bot.channels.cache.get(activeChannel).send(message);
-                }
-            } catch (e) {
-                logger.error(e);
-            }
-
-        }
-
-        if (command === 'slap') {
-
-            if (profile.credit > 10) {
-                const embed = new Discord.MessageEmbed()
-                profile.credit -= 10;
-                await saveProfile(msg.author.id, profile);
-                logger.debug('slapping in progress');
-
-                const user = msg.mentions.users.first()
-                embed.setTitle(`Someone just recieved a major SLAP! :clap:`)
-                embed.setDescription(`${user} ouch! That must have hurt!`)
-                embed.setFooter(`slap powered by ${msg.author.username}`)
-                msg.channel.send(embed)
-            } else {
-                msg.reply('You need 10 credits to slap someone!');
-            }
-        }
-
-        if (command === 'getcredits') {
-            //const user = msg.author
-            profile.credit += 10;
-            msg.reply('Your wish is fulfilled!');
-        }
-
-        if (command === 'getlevel') {
-            //const user = msg.author
-            profile.level += 1;
-            msg.reply('Your wish is fulfilled!');
-        }
-
-        if (command === 'getxp') {
-            //const user = msg.author
-            profile.xp += 100;
-            msg.reply('Your wish is fulfilled!');
-        }
-
-        if (command === 'stats') {
-
-            const embed = new Discord.MessageEmbed()
-
-            let selectedProfile = profile;
-
-            const user = msg.mentions.users.first()
-
-            if (user) { // OTHER USER
-                selectedProfile = await getProfile(user.id);
-            }
-
-            const name = user ? user.username : msg.author.username;
-
-            embed.setTitle(`${name}'s stats`)
-            embed.setDescription(`Level: ${selectedProfile.level} Current XP progress: ${selectedProfile.xp}/100  XP: Last seen: ${selectedProfile.lastSeen} Credits: ${selectedProfile.credit}`);
-            msg.channel.send(embed)
-        }
-
-
-        if (command === 'help') {
-            let embed = new Discord.MessageEmbed()
-            embed.setTitle('Avaiable commands:')
-            embed.setDescription(`usage: !commandName`);
-            embed.addField("See a user's status", "`!stats @user`");
-            embed.addField("Slap someone", "`!slap @user`");
-            embed.addField("Complete a task", '`!complete HBP3-1234`');
-            embed.addField("Steal credits", '`!steal @user`');
-            embed.addField("Announce something important", '`!announce <text>`')
-            embed.addField("Change color", '`!color random`')
-            //embed.setFooter(`this embed made by ${msg.author.username}`)
-            msg.channel.send(embed)
-
+        } catch (error) {
+            console.error(error);
+            msg.reply('There was an error trying to execute that command!');
         }
 
         profile.lastSeen = new Date().toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' })
