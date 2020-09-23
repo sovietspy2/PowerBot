@@ -54,7 +54,7 @@ async function handleFirstLoginOfTheDay(msg) {
 
             firstLoginWinner = msg.author.id;
             console.log("first winner announced");
-            bot.channels.cache.get(activeChannel).send(`<@${msg.author.id}> is the first today and recieved 25 XP and 10 credits! :yawning_face: `);
+            //bot.channels.cache.get(activeChannel).send(`<@${msg.author.id}> is the first today and recieved 25 XP and 10 credits! :yawning_face: `);
         }
     }
 }
@@ -168,14 +168,20 @@ async function main() {
         }
 
         if (command === 'announce') {
+
+            const pattern = new RegExp('[a-z ]', 'g');
+
             try {
                 const message = args
                     .map(item => item.toLocaleLowerCase())
                     .join(" ")
                     .split("")
+                    .filter(letter => letter.match(pattern))
                     .map(letter => letter != " " ? `:regional_indicator_${letter}:` : " ")
                     .join("");
-                bot.channels.cache.get(activeChannel).send(message);
+                if (message) {
+                    bot.channels.cache.get(activeChannel).send(message);
+                }
             } catch (e) {
                 logger.error(e);
             }
