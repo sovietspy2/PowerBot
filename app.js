@@ -108,7 +108,6 @@ async function main() {
         handleFirstLoginOfTheDay(msg);
 
         if (msg.content[0] !== prefix) {
-            console.log('no prefix')
             return
         }
 

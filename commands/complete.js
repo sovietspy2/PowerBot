@@ -24,9 +24,9 @@ module.exports = {
         for (task of args) {
 
             if (task.includes(process.env.COMPLETE_TEMPLATE) && await validateTask(task, profile.id, db)) {
-                message.channel.send(`<@${profile.id}> just completed :white_check_mark:${task} and recieved 30XP `);
+                message.channel.send(`<@${profile.id}> just completed :white_check_mark:${task} and recieved 30XP and 10 credits`);
                 profile.xp += 30;
-                profile.credits += 10;
+                profile.credit += 10;
             } else {
                 message.reply('Nah not happening! This seems fishy!');
             }

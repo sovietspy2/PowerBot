@@ -8,11 +8,11 @@ module.exports = {
         embed.setTitle('Avaiable commands:')
         embed.setDescription(`usage: !commandName`);
         embed.addField("See a user's status", "`!stats @user`");
-        embed.addField("Slap someone", "`!slap @user`");
+        embed.addField("Slap someone", "`!slap @user <reason>`");
         embed.addField("Complete a task", '`!complete HBP3-1234`');
         embed.addField("Steal credits", '`!steal @user`');
         embed.addField("Announce something important", '`!announce <text>`')
-        embed.addField("Change color", '`!color random`')
+        embed.addField("Change color", '`!color <colorName OR reset>`');
         //embed.setFooter(`this embed made by ${msg.author.username}`)
         message.channel.send(embed)
     },
